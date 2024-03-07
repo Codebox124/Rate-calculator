@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +10,14 @@
         /* Additional styles can be added here */
     </style>
 </head>
+
 <body class="bg-gray-100 p-4">
     <div class="max-w-md mx-auto bg-white p-8 rounded-md shadow-md">
         <h2 class="text-xl font-semibold mb-4">Exchange Rate Calculator</h2>
         <div>
             <label class="block mb-2" for="sendTo">I want to send to:</label>
-            <select id="sendTo" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            <select id="sendTo"
+                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
                 <option value="FJD">Fiji (Digicel)</option>
                 <option value="PGK">PNG (Digicel)</option>
                 <option value="TOP">Tonga (Digicel)</option>
@@ -24,20 +27,25 @@
         </div>
         <div class="mt-4">
             <label class="block mb-2" for="sendFrom">I want to send from:</label>
-            <select id="sendFrom" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            <select id="sendFrom"
+                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
                 <option value="NZD">New Zealand Dollar</option>
                 <option value="AUD">Australian Dollar</option>
             </select>
         </div>
         <div class="mt-4">
             <label class="block mb-2" for="amount">I want $</label>
-            <input type="number" id="amount" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200" placeholder="Enter amount">
+            <input type="number" id="amount"
+                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200"
+                placeholder="Enter amount">
             <label class="block mb-2 mt-2" for="receiveIn">in</label>
-            <select id="receiveIn" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
+            <select id="receiveIn"
+                class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
                 <!-- Options will be dynamically populated based on selection -->
             </select>
         </div>
-        <button id="calculateBtn" class="mt-6 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Calculate</button>
+        <button id="calculateBtn"
+            class="mt-6 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Calculate</button>
         <div id="result" class="mt-4 text-center font-semibold"></div>
     </div>
 
@@ -98,32 +106,39 @@
         // Populate initial receiveIn options
         updateReceiveOptions();
 
-        document.getElementById('calculateBtn').addEventListener('click', function() {
+        document.getElementById('calculateBtn').addEventListener('click', function () {
             var sendTo = document.getElementById('sendTo').value;
             var sendFrom = document.getElementById('sendFrom').value;
             var amount = parseFloat(document.getElementById('amount').value);
             var receiveIn = document.getElementById('receiveIn').value;
 
-            // Fetch exchange rates from somewhere or calculate them manually
+            // Exchange rates and transfer fees
             var exchangeRates = {
                 'NZD': { 'FJD': 2.0, 'PGK': 3.0, 'TOP': 4.0, 'VUV': 5.0, 'WST': 6.0, 'AUD': 1.1 },
-                'AUD': { 'FJD': 1.4448, 'PGK': 2.0, 'TOP': 3.0, 'VUV': 4.0, 'WST': 5.0, 'AUD': 1.0 }
+                'AUD': { 'FJD': 1.448, 'PGK': 2.0, 'TOP': 3.0, 'VUV': 4.0, 'WST': 5.0, 'AUD': 1.0 }
+            };
+            var transferFees = {
+                'AUD': 4,
+                'FJD': 4,
             };
 
             // Adjust exchange rate for specific currency pair
             if (sendTo === 'FJD' && sendFrom === 'AUD') {
-                exchangeRates['AUD']['FJD'] = 1.4448; // Adjusted exchange rate
+                exchangeRates['AUD']['FJD'] = 1.448; // Adjusted exchange rate
             }
 
+            // Calculate cost
             var rate = exchangeRates[sendFrom][receiveIn];
-            var transferFee = 4; // Transfer fee in AUD
-            var resultAmount = ((amount * rate) + transferFee).toFixed(2); // Add transfer fee
+            var transferFee = transferFees[sendFrom] || 0; // Get transfer fee for sendFrom currency, default to 0 if not found
+            var totalCost = (amount * rate) + transferFee;
 
-            var resultString = "It will cost $" + resultAmount + " " + receiveIn + " to send $" + amount + " " + sendTo + " to someone in " + document.getElementById('sendTo').options[document.getElementById('sendTo').selectedIndex].text + ".<br>";
-            resultString += "They will receive $" + amount + " " + sendTo + ".";
-            
+            // Display result
+            var resultString = "It will cost $" + totalCost.toFixed(2) + " AUD to send $" + amount.toFixed(2) + " " + sendTo + " to someone in " + document.getElementById('sendTo').options[document.getElementById('sendTo').selectedIndex].text + ".<br>";
+            resultString += "They will receive $" + (amount * rate).toFixed(2) + " " + sendTo + ".";
             document.getElementById('result').innerHTML = resultString;
+
         });
     </script>
 </body>
+
 </html>
