@@ -34,8 +34,7 @@
             <input type="number" id="amount" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200" placeholder="Enter amount">
             <label class="block mb-2 mt-2" for="receiveIn">in</label>
             <select id="receiveIn" class="block w-full border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200">
-                <option value="FJD">FDJ</option>
-                <option value="AUD">AUD</option>
+                <!-- Options will be dynamically populated based on selection -->
             </select>
         </div>
         <button id="calculateBtn" class="mt-6 w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600">Calculate</button>
@@ -43,6 +42,62 @@
     </div>
 
     <script>
+        document.getElementById('sendFrom').addEventListener('change', updateReceiveOptions);
+        document.getElementById('sendTo').addEventListener('change', updateReceiveOptions);
+
+        function updateReceiveOptions() {
+            var sendFrom = document.getElementById('sendFrom').value;
+            var sendTo = document.getElementById('sendTo').value;
+            var receiveInSelect = document.getElementById('receiveIn');
+
+            // Clear previous options
+            receiveInSelect.innerHTML = '';
+
+            // Add appropriate options based on sendFrom and sendTo
+            if (sendTo === 'FJD' && (sendFrom === 'NZD' || sendFrom === 'AUD')) {
+                receiveInSelect.innerHTML += '<option value="FJD">FJD</option>';
+                if (sendFrom === 'NZD') {
+                    receiveInSelect.innerHTML += '<option value="NZD">NZD</option>';
+                } else {
+                    receiveInSelect.innerHTML += '<option value="AUD">AUD</option>';
+                }
+            } else if (sendTo === 'PGK' && (sendFrom === 'NZD' || sendFrom === 'AUD')) {
+                receiveInSelect.innerHTML += '<option value="PGK">PGK</option>';
+                if (sendFrom === 'NZD') {
+                    receiveInSelect.innerHTML += '<option value="NZD">NZD</option>';
+                } else {
+                    receiveInSelect.innerHTML += '<option value="AUD">AUD</option>';
+                }
+            } else if (sendTo === 'TOP' && (sendFrom === 'NZD' || sendFrom === 'AUD')) {
+                receiveInSelect.innerHTML += '<option value="TOP">TOP</option>';
+                if (sendFrom === 'NZD') {
+                    receiveInSelect.innerHTML += '<option value="NZD">NZD</option>';
+                } else {
+                    receiveInSelect.innerHTML += '<option value="AUD">AUD</option>';
+                }
+            } else if (sendTo === 'VUV' && (sendFrom === 'NZD' || sendFrom === 'AUD')) {
+                receiveInSelect.innerHTML += '<option value="VUV">VUV</option>';
+                if (sendFrom === 'NZD') {
+                    receiveInSelect.innerHTML += '<option value="NZD">NZD</option>';
+                } else {
+                    receiveInSelect.innerHTML += '<option value="AUD">AUD</option>';
+                }
+            } else if (sendTo === 'WST' && (sendFrom === 'NZD' || sendFrom === 'AUD')) {
+                receiveInSelect.innerHTML += '<option value="WST">WST</option>';
+                if (sendFrom === 'NZD') {
+                    receiveInSelect.innerHTML += '<option value="NZD">NZD</option>';
+                } else {
+                    receiveInSelect.innerHTML += '<option value="AUD">AUD</option>';
+                }
+            }
+
+            // Set default option
+            receiveInSelect.value = receiveInSelect.options[0].value;
+        }
+
+        // Populate initial receiveIn options
+        updateReceiveOptions();
+
         document.getElementById('calculateBtn').addEventListener('click', function() {
             var sendTo = document.getElementById('sendTo').value;
             var sendFrom = document.getElementById('sendFrom').value;
@@ -51,19 +106,20 @@
 
             // Fetch exchange rates from somewhere or calculate them manually
             var exchangeRates = {
-                'NZD': { 'FJD': 2.0, 'AUD': 1.1 },
-                'AUD': { 'FJD': 1.8, 'AUD': 1.0 }
+                'NZD': { 'FJD': 2.0, 'PGK': 3.0, 'TOP': 4.0, 'VUV': 5.0, 'WST': 6.0, 'AUD': 1.1 },
+                'AUD': { 'FJD': 1.4448, 'PGK': 2.0, 'TOP': 3.0, 'VUV': 4.0, 'WST': 5.0, 'AUD': 1.0 }
             };
 
             // Adjust exchange rate for specific currency pair
             if (sendTo === 'FJD' && sendFrom === 'AUD') {
-                exchangeRates['AUD']['FJD'] = 0.705; // Adjusted exchange rate
+                exchangeRates['AUD']['FJD'] = 1.4448; // Adjusted exchange rate
             }
 
             var rate = exchangeRates[sendFrom][receiveIn];
-            var resultAmount = (amount * rate).toFixed(2);
+            var transferFee = 4; // Transfer fee in AUD
+            var resultAmount = ((amount * rate) + transferFee).toFixed(2); // Add transfer fee
 
-            var resultString = "It will cost $" + resultAmount + " " + sendFrom + " to send $" + amount + " " + sendTo + " to someone in " + document.getElementById('sendTo').options[document.getElementById('sendTo').selectedIndex].text + ".<br>";
+            var resultString = "It will cost $" + resultAmount + " " + receiveIn + " to send $" + amount + " " + sendTo + " to someone in " + document.getElementById('sendTo').options[document.getElementById('sendTo').selectedIndex].text + ".<br>";
             resultString += "They will receive $" + amount + " " + sendTo + ".";
             
             document.getElementById('result').innerHTML = resultString;
